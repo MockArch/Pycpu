@@ -7,7 +7,7 @@ __Author = MockArch
 __Github = https://github.com/MockArch
 """
 import subprocess
-
+import traceback
 
 class CpuMeta(object):
     """
@@ -36,15 +36,27 @@ class CpuMeta(object):
     def _get_cpu_data(self):
         try:
             data = subprocess.Popen(["cat", "/proc/stat"], stdout=subprocess.PIPE)
-            data = data.communicate()
+            data = data.communicate()[0].decode('utf-8').split('\n')
             for cpus in data:
                 if "cpu" in cpus:
-                    self.cpu_data.append(cpus)
+                    self.cpu_data.append(
+                        tuple([i for i in  cpus.split(" ") if not (i.isspace() or i == "") ])
+                    )
         except Exception as e:
-            print(e)   
+            print(e)
+            print(traceback.format_exc())
     
     def calculate_number_of_cpu(self):
         self.number_of_cpu = len(self.cpu_data) - 1
+
+    def calculate_cpu_utilization(self):
+        cpu_data = {}
+        
+        
+    def _remove_white_spaces(self, _list):
+        pass
+
+
 
 
 
@@ -57,4 +69,5 @@ class CpuMeta(object):
 if __name__ == "__main__":
     obj = CpuMeta()
     obj.get_cpu_usage_percentage()
+    print(obj.cpu_data)
 
